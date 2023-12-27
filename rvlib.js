@@ -1,7 +1,11 @@
 
 class RV32I {
-    constructor(name, description) {
-
+    constructor(name, textAddress, dataAddress, sdataAddress) {
+        this.name = name;
+        this.textAddress = textAddress;
+        this.dataAddress = dataAddress;
+        this.sdataAddress = sdataAddress;
+        this.pc = textAddress;        
     }
     programHex() { }
     programBin() { }
