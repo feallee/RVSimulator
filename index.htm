@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="rvlib.js"></script>
+</head>
+
+<body>
+    <div id="displayer" style="border: solid 1px;width :48px; text-align: center;">
+        <svg width="32" height="56" xmlns="http://www.w3.org/2000/svg">
+            <g>
+                <path id="led_a"
+                    d="m5.06479,5.08542l4.34143,-4.34219l13.02428,0l4.34144,4.34219l-4.34144,4.3422l-13.02428,0l-4.34143,-4.3422z"
+                    fill="red" stroke-width="0" stroke="#000" />
+                <path transform="rotate(90 27.3392 16.6439)" id="led_b"
+                    d="m16.48498,16.64401l4.34143,-4.34219l13.02428,0l4.34144,4.34219l-4.34144,4.3422l-13.02428,0l-4.34143,-4.3422z"
+                    fill="orange" stroke-width="0" stroke="#000" />
+                <path transform="rotate(90 72.0873 39.75)" id="led_c"
+                    d="m61.23292,84.40466l4.34143,-4.34219l13.02428,0l4.34144,4.34219l-4.34144,4.3422l-13.02428,0l-4.34143,-4.3422z"
+                    fill="yellow" stroke-width="0" stroke="#000" />
+                <path id="led_d"
+                    d="m5.06478,51.06438l4.34143,-4.34219l13.02428,0l4.34144,4.34219l-4.34144,4.3422l-13.02428,0l-4.34143,-4.3422z"
+                    fill="green" stroke-width="0" stroke="#000" />
+                <path transform="rotate(90 4.50025 39.679)" id="led_e"
+                    d="m-6.35344,39.67892l4.34143,-4.34219l13.02428,0l4.34144,4.34219l-4.34144,4.3422l-13.02428,0l-4.34143,-4.3422z"
+                    fill="cyan" stroke-width="0" stroke="#000" />
+                <path transform="rotate(90 4.52524 16.6939)" id="led_f"
+                    d="m-6.32775,16.69478l4.34143,-4.34219l13.02428,0l4.34144,4.34219l-4.34144,4.3422l-13.02428,0l-4.34143,-4.3422z"
+                    fill="purple" stroke-width="0" stroke="#000" />
+                <path id="led_g"
+                    d="m5.06478,28.15572l4.34143,-4.34219l13.02428,0l4.34144,4.34219l-4.34144,4.3422l-13.02428,0l-4.34143,-4.3422z"
+                    fill="blue" stroke-width="0" stroke="#000" />
+            </g>
+        </svg>
+    </div>
+    <div>
+        <input type="file" id="file" accept=".bin"/>
+    </div>
+    <script>
+
+
+        /* 12-34+56
+           0:        00c00513        addi x10 x0 12
+           4:        fde50513        addi x10 x10 -34
+           8:        03850513        addi x10 x10 56
+           c:        00008067        jalr x0 x1 0
+           "00c00513fde505130385051300008067"
+           */
+
+        let rv = new RV32I();
+        let vv = rv.decode(0x003170b3);
+        let li = rv.disassembly(vv);
+        console.log(li);
+
+        const fileinput = document.getElementById('file');
+        fileinput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            const reader = new FileReader();            
+            reader.readAsArrayBuffer(file)
+            reader.onload = (e) => {
+                const content = e.target.result;
+                console.log(content);
+            };
+        });
+
+
+        document.getElementById("led_b").attributes["fill"].value = "black";
+
+    </script>
+</body>
+
+</html>
