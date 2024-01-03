@@ -1,11 +1,23 @@
 /*
 See:https://sourceware.org/binutils/docs/ld/
 */
-SECTIONS
+
+MEMORY
 {
-  . = 0x00000000;    
-  .text : { *(.text) }
-  . = 0x10000000;
-  .data : { *(.data)}
-  .bss : { *(.bss) }  
+  ROM : ORIGIN = 0x00000000, LENGTH = 1K
+  RAM : ORIGIN = 0x00000400, LENGTH = 1K
+}
+
+SECTIONS
+{  
+  .text :
+  { 
+    *(.text)
+    *(.rodata)  
+  } >ROM   
+  .data :
+  { 
+    *(.data)           
+    *(.sdata)           
+  } >RAM
 }

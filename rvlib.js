@@ -5,7 +5,7 @@ class RV32I {
         this.textAddress = textAddress;
         this.dataAddress = dataAddress;
         this.sdataAddress = sdataAddress;
-        this.pc = textAddress;        
+        this.pc = textAddress;
     }
     programHex() { }
     programBin() { }
@@ -37,7 +37,7 @@ class RV32I {
             (code & 0b00000000_00001111_11110000_00000000);//imm[19:12]
         return obj;
     }
-    disassembly(obj) {
+    disassembly(obj) {//全部基础指令
         let line = "";
         switch (obj.opcode) {
             case 0b0110111:
@@ -145,7 +145,7 @@ class RV32I {
 
                 }
                 else {
-                    line = "i ?";
+                    line = "logici ?";
                 }
                 break;
             case 0b0110011:
@@ -180,22 +180,52 @@ class RV32I {
                     line = `and x${obj.rd},x${obj.rs1},x${obj.rs2}`;
                 }
                 else {
-                    line = "r ?";
+                    line = "logic ?";
                 }
                 break;
-            //The following 7 instructions were not implemented:
-            // fence
-            // fence.i
-            // ecall
-            // ebreak
-            // csrrw
-            // csrrs
-            // csrrc
-            // csrrwi
-            // csrrsi
-            // csrrci
+            case 0b0001111:
+                if (obj.rd == 0b00000 && obj.fun3 == 0b000 && obj.rs1 == 0b00000 && (obj.immI >>> 8) == 0b0000) {
+                    line = `fence ${(obj.immI & 0b0000_11110000) >>> 4},x${obj.immI & 0b0000_00001111}`;//fence pred, succ
+                }
+                else if (obj.rd == 0b00000 && obj.fun3 == 0b001 && obj.rs1 == 0b00000 && obj.immI == 0b0000_00000000) {
+                    line = `fence.i`;
+                }
+                else {
+                    line = "fence ?";
+                }
+                break;
+            case 0b1110011:
+                if (obj.rd == 0b00000 && obj.fun3 == 0b000 && obj.rs1 == 0b00000 && obj.immI == 0b0000_00000000) {
+                    line = "ecall";
+                }
+                else if (obj.rd == 0b00000 && obj.fun3 == 0b000 && obj.rs1 == 0b00000 && obj.immI == 0b0000_00000001) {
+                    line = "ebreak";
+                }
+                else if (obj.fun3 == 0b001) {
+                    line = `csrrw x${obj.rd},${obj.immI},x${obj.rs1}`;//csrrw rd, csr, rs1
+                }
+                else if (obj.fun3 == 0b010) {
+                    line = `csrrs x${obj.rd},${obj.immI},x${obj.rs1}`;//csrrs rd, csr, rs1
+                }
+                else if (obj.fun3 == 0b011) {
+                    line = `csrrc x${obj.rd},${obj.immI},x${obj.rs1}`;//csrrc rd, csr, rs1
+                }
+                else if (obj.fun3 == 0b101) {
+                    line = `csrrwi ${obj.rd},${obj.immI},${obj.rs1}`;//csrrwi x0, csr, imm
+                }
+                else if (obj.fun3 == 0b110) {
+                    line = `csrrsi ${obj.rd},${obj.immI},${obj.rs1}`;//csrrwi x0, csr, imm
+                }
+                else if (obj.fun3 == 0b111) {
+                    line = `csrrci ${obj.rd},${obj.immI},${obj.rs1}`;//csrrwi x0, csr, imm
+                }
+                else {
+                    line = "csr ?"
+                }
+                break;
+
             default:
-                line = "unknown";
+                line = "? ?";
                 break;
         }
         return line;
