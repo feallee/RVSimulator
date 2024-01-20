@@ -1,14 +1,15 @@
 
 class RV32I {
-    constructor(name, textAddress, dataAddress, sdataAddress) {
-        this.name = name;
-        this.textAddress = textAddress;
-        this.dataAddress = dataAddress;
-        this.sdataAddress = sdataAddress;
-        this.pc = textAddress;
+    constructor(name) {
+        this.Name = name;         
+        this.Registers=new Uint32Array[32];
+        this.PC = 0;
     }
     programHex() { }
-    programBin() { }
+    programBin(data) {
+        this.Memory = new Object();
+        
+    }
     decode(code) {
         let obj = new Object();
         //R-Type & other

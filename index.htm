@@ -110,7 +110,7 @@
         </svg>
     </div>
     <div>
-        <input type="file" id="file" accept=".bin"/>
+        <input type="file" id="file" accept=".bin" />
     </div>
     <script>
 
@@ -123,19 +123,22 @@
            "00c00513fde505130385051300008067"
            */
 
-        let rv = new RV32I();
-        let vv = rv.decode(0x003170b3);
-        let li = rv.disassembly(vv);
-        console.log(li);
+
+
+
+        let cpu = new RV32I("rv32i", 0, 0x1000, 0x2000);
+        let vv = cpu.decode(0x003170b3);
+        let li = cpu.disassembly(vv);
+
+
 
         const fileinput = document.getElementById('file');
         fileinput.addEventListener('change', (event) => {
             const file = event.target.files[0];
-            const reader = new FileReader();            
-            reader.readAsArrayBuffer(file)
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
             reader.onload = (e) => {
-                const content = e.target.result;
-                console.log(content);
+                cpu.programBin(e.target.result);
             };
         });
 
