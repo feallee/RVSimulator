@@ -7,29 +7,29 @@
 </head>
 
 <body>
-    
+
     <div>
         <input type="file" id="file" accept=".bin" />
     </div>
     <script>
         let cpu = new RV32I("rv32i", 1024);
-         /* 34=12-34+56
-           0:        00c00513        addi x10 x0 12
-           4:        fde50513        addi x10 x10 -34
-           8:        03850513        addi x10 x10 56
-           c:        00008067        jalr x0 x1 0
-           */
+        /* 34=12-34+56
+          0:        00c00513        addi x10 x0 12
+          4:        fde50513        addi x10 x10 -34
+          8:        03850513        addi x10 x10 56
+          c:        00008067        jalr x0 x1 0
+          */
         let arr = new Array(0x00, 0xc0, 0x05, 0x13, 0xfd, 0xe5, 0x05, 0x13, 0x03, 0x85, 0x05, 0x13, 0x00, 0x00, 0x80, 0x67);
         cpu.program(arr);
         while (1) {
-            let pc=cpu.PC;
+            let pc = cpu.PC;
             let instr = cpu.fetch();
-            let code = cpu.decode(instr);            
+            let code = cpu.decode(instr);
             let asm = cpu.disassembly(code);
-            console.log(pc.toString(16).padStart(8,'0'),"\t",instr.toString(16).padStart(8,'0'),"\t",asm);
+            console.log(pc.toString(16).padStart(8, '0'), "\t", instr.toString(16).padStart(8, '0'), "\t", asm);
             cpu.execute(code);
         }
-        
+
     </script>
 </body>
 

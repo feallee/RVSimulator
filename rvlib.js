@@ -7,7 +7,7 @@ class RV32I {
         this.PC = 0;
     }
     program(codeArray) {
-       
+
         if (codeArray.length <= this.Rom.byteLength) {
             for (let i = 0; i < codeArray.length; i++) {
                 this.Rom[i] = codeArray[i];
@@ -22,8 +22,8 @@ class RV32I {
         if (this.PC >= this.Rom.byteLength) {
             this.PC = 0;
         }
-        const v = this.Rom[this.PC]*0x1000000 +this.Rom[this.PC+1]*0x10000+this.Rom[this.PC+2]*0x100+this.Rom[this.PC+3];
-        this.PC += 4;        
+        const v = this.Rom[this.PC] * 0x1000000 + this.Rom[this.PC + 1] * 0x10000 + this.Rom[this.PC + 2] * 0x100 + this.Rom[this.PC + 3];
+        this.PC += 4;
         return v;
     }
     decode(code) {
