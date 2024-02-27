@@ -1,14 +1,30 @@
 
 class RV32I {
-    constructor(name) {
-        this.Name = name;         
-        this.Registers=new Uint32Array[32];
+    constructor(name, romSize) {
+        this.Name = name;
+        this.Registers = new Uint32Array(32);
+        this.Rom = new Uint8Array(romSize);
         this.PC = 0;
     }
-    programHex() { }
-    programBin(data) {
-        this.Memory = new Object();
-        
+    program(codeArray) {
+       
+        if (codeArray.length <= this.Rom.byteLength) {
+            for (let i = 0; i < codeArray.length; i++) {
+                this.Rom[i] = codeArray[i];
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    fetch() {
+        if (this.PC >= this.Rom.byteLength) {
+            this.PC = 0;
+        }
+        const v = this.Rom[this.PC]*0x1000000 +this.Rom[this.PC+1]*0x10000+this.Rom[this.PC+2]*0x100+this.Rom[this.PC+3];
+        this.PC += 4;        
+        return v;
     }
     decode(code) {
         let obj = new Object();
@@ -232,6 +248,27 @@ class RV32I {
         return line;
     }
     execute(obj) {
-
+        switch (obj.opcode) {
+            case 0b1100111:
+                if (obj.fun3 == 0b000) {
+                    //`jalr x${obj.rd},x${obj.rs1},${obj.immI}`;
+                    if (obj.rd > 0) {
+                        this.Registers[obj.rd] = this.PC;
+                    }
+                    this.PC = (this.Registers[obj.rs1] + obj.immI) & (~1);
+                }
+                break;
+            case 0b0010011:
+                if (obj.fun3 == 0b000) {
+                    //`addi x${obj.rd},x${obj.rs1},${obj.immI}`;
+                    this.Registers[obj.rd] = this.Registers[obj.rs1] + obj.immI;
+                }
+                break;
+            //case 0b
+            // 其它指令
+            default:
+                //异常指令
+                break;
+        }
     }
 }
