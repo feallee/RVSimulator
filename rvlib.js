@@ -1,10 +1,52 @@
 
+class Memory {
+    #buffer;
+    #offset;
+    #onRead;
+    #onWrite;
+    constructor(offset, size,onRead,onWrite) {
+        this.#offset = offset;
+        this.#buffer = new Uint8Array(size);
+        this.#onRead = onRead;
+        this.#onWrite = onWrite;
+    }
+    GetOffset() {
+        return this.#offset;
+    }
+    ReadWord(index) {
+        const v = new DataView(this.#buffer);              
+        return v.getUint32(index);
+    }
+    WriteWord(address, value) {
+        const v = new DataView(this.#buffer);
+        v.setUint32(address, value);
+    }
+    ReadHalfword(address) {
+        const v = new DataView(this.#buffer);
+        return v.getUint16(address);
+    }
+    WriteHalfword(address, value) {
+        const v = new DataView(this.#buffer);
+        v.setUint16(address, value);
+    }
+    ReadByte(address) {
+        const v = new DataView(this.#buffer);
+        return v.getUint8(address);
+    }
+    WriteByte(address, value) {
+        const v = new DataView(this.#buffer);
+        v.setUint8(address, value);
+    }
+}
+
 class RV32I {
-    constructor(name, romSize) {
+    constructor(name, registerAddress, registerSize, peripheralAddress, peripheralSize, romAddress, romSize, ramAddress, ramSize) {
         this.Name = name;
-        this.Registers = new Uint32Array(32);
-        this.Rom = new Uint8Array(romSize);
-        this.PC = 0;
+        this.Register = new Memory(registerAddress, registerSize);
+        this.Peripheral = new Memory(peripheralAddress, peripheralSize);
+        this.Rom = new Memory(romAddress, romSize);
+        this.Ram = new Memory(ramAddress, ramSize);
+        this.PC = romAddress;
     }
     program(codeArray) {
 
@@ -34,7 +76,7 @@ class RV32I {
         obj.fun3 = (code & 0b00000000_00000000_01110000_00000000) >> 12;
         obj.rs1 = (code & 0b00000000_00001111_10000000_00000000) >> 15;
         obj.rs2 = (code & 0b00000001_11110000_00000000_00000000) >> 20;
-        obj.fun7 = (code & 0b11111110_00000000_00000000_00000000) >> 25;
+        obj.fun7 = (code & 0b11111110_00000000_00000000_00000000) >>> 25;
         //I-type
         obj.immI = (code & 0b11111111_11110000_00000000_00000000) >> 20;//imm[11:0]
         //S-type
@@ -46,7 +88,7 @@ class RV32I {
             ((code & 0b00000000_00000000_00001111_00000000) >> 7) | //imm[4:1]           
             ((code & 0b00000000_00000000_00000000_10000000) << 4);//imm[11]
         //U-type
-        obj.immU = code & 0b11111111_11111111_11110000_00000000;//imm[31:12];
+        obj.immU = (code & 0b11111111_11111111_11110000_00000000) >> 12;//imm[31:12];
         //J-type                               
         obj.immJ = ((code & 0b10000000_00000000_00000000_00000000) >> 11) | //imm[20]                      
             ((code & 0b01111111_11100000_00000000_00000000) >> 20) | //imm[10:1]           
@@ -58,10 +100,10 @@ class RV32I {
         let line = "";
         switch (obj.opcode) {
             case 0b0110111:
-                line = `lui x${obj.rd},${obj.immU >> 12}`;
+                line = `lui x${obj.rd},${obj.immU}`;
                 break;
             case 0b0010111:
-                line = `auipc x${obj.rd},${obj.immU >> 12}`;
+                line = `auipc x${obj.rd},${obj.immU}`;
                 break;
             case 0b1101111:
                 line = `jal x${obj.rd},${obj.immJ}`;
